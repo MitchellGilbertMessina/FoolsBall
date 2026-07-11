@@ -645,6 +645,9 @@ MonoBehaviour:
   rotationIndex: 0
   slideIndex: 1
   buttonIndex: 4
+  limitAIndex: 6
+  limitBIndex: 7
+  invertLimitMapping: 0
   slideMin: 94.6
   slideMax: 990
   slideRange: 0.12
@@ -3338,6 +3341,9 @@ MonoBehaviour:
   rotationIndex: 2
   slideIndex: 3
   buttonIndex: 5
+  limitAIndex: 8
+  limitBIndex: 9
+  invertLimitMapping: 0
   slideMin: -671
   slideMax: -17
   slideRange: 0.12

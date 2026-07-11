@@ -17,7 +17,7 @@ public class SerialManager : MonoBehaviour
     private volatile bool keepReading = true;
 
     private readonly object dataLock = new object();
-    private float[] parsedValues = new float[6];
+    private float[] parsedValues = new float[10];
 
     // ---------------- STATE ----------------
     public bool IsConnected { get; private set; }
