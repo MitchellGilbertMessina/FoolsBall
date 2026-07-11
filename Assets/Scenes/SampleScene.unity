@@ -739,7 +739,7 @@ MonoBehaviour:
   invertLimitMapping: 0
   slideMin: 94.6
   slideMax: 990
-  slideRange: 0.16
+  slideRange: 0.2
   rotationDirection: -1
 --- !u!1 &116621738
 GameObject:
@@ -1077,7 +1077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e133f2fbaeb3c42c79f5d87b306b5916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SerialManager
-  baudRate: 115200
+  baudRate: 230400
   minExpectedValues: 5
   maxExpectedValues: 10
 --- !u!114 &230589837
@@ -3095,7 +3095,7 @@ MonoBehaviour:
   invertLimitMapping: 0
   slideMin: -671
   slideMax: -17
-  slideRange: 0.16
+  slideRange: 0.2
   rotationDirection: 1
 --- !u!1 &1513337458
 GameObject:
