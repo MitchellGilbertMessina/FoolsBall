@@ -1991,7 +1991,7 @@ GameObject:
   - component: {fileID: 385074168}
   - component: {fileID: 385074167}
   m_Layer: 0
-  m_Name: Wall (6)
+  m_Name: Sidewall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4661,13 +4661,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 411b894959ad048bf90925d3371a7de9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoosballKeyboardController
-  player1Rod: {fileID: 92493597}
-  player2Rod: {fileID: 1454322433}
+  player1Rod: {fileID: 1454322433}
+  player2Rod: {fileID: 92493597}
+  wall1: {fileID: 385074165}
+  wall2: {fileID: 1814632233}
   groundPlaneObj: {fileID: 1528128304}
   slideSpeed: 0.7
   rotationSpeed: 750
-  slideMin: 0
-  slideMax: 1
+  wallPadding: 0.05
+  mouseSensitivity: 1
 --- !u!4 &1540624566
 Transform:
   m_ObjectHideFlags: 0
@@ -5171,7 +5173,7 @@ GameObject:
   - component: {fileID: 1814632236}
   - component: {fileID: 1814632235}
   m_Layer: 0
-  m_Name: Wall (7)
+  m_Name: Sidewall2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
