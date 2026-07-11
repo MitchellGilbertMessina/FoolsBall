@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1814183166190650608}
+  - component: {fileID: 4369672528724965574}
   m_Layer: 0
   m_Name: BlueBody
   m_TagString: Untagged
@@ -24,9 +25,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 798514262592605696}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.1008, z: 0.27}
-  m_LocalScale: {x: 0.1599999, y: 0.16000004, z: 0.16000001}
+  m_LocalScale: {x: 0.31999972, y: 20, z: 20}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 9102593467552013753}
@@ -34,6 +35,33 @@ Transform:
   - {fileID: 3724318383963840590}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &4369672528724965574
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 798514262592605696}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
 --- !u!1 &2947580854246614043
 GameObject:
   m_ObjectHideFlags: 0
@@ -158,7 +186,6 @@ GameObject:
   - component: {fileID: 655325440048873327}
   - component: {fileID: 5366796702891926907}
   - component: {fileID: 8733636653189647565}
-  - component: {fileID: 8745800055417100093}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -259,19 +286,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8745800055417100093
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2960064569180793257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c12da5b8709d34f8e92f79261b626f37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FoosballKick
-  kickForce: 0.1
 --- !u!1 &7373156512436547148
 GameObject:
   m_ObjectHideFlags: 0
