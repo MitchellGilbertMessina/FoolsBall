@@ -81,8 +81,6 @@ public class FoosballController : MonoBehaviour
         
         // ---------------- SLIDE CALIBRATION ----------------
         float rawSlide = SerialManager.Instance.GetValue(slideIndex);
-        float t = Mathf.InverseLerp(slideMin, slideMax, rawSlide);
-        targetLocalX = Mathf.Lerp(-slideRange, slideRange, t);
 
         bool limitA = SerialManager.Instance.GetValue(limitAIndex) == 1f;
         bool limitB = SerialManager.Instance.GetValue(limitBIndex) == 1f;
@@ -124,23 +122,20 @@ public class FoosballController : MonoBehaviour
         prevLimitA = limitA;
         prevLimitB = limitB;
 
-        // ---------------- SLIDE POSITION ----------------
-        Vector3 pos = transform.localPosition;
-
+        // ---------------- SLIDE POSITION (target only; FixedUpdate applies it via physics) ----------------
         if (lerpOverrideActive)
         {
-            pos.x = Mathf.MoveTowards(pos.x, lerpTarget, lerpSpeed * Time.deltaTime);
+            // Ease toward the freshly-calibrated end stop instead of snapping.
+            targetLocalX = Mathf.MoveTowards(targetLocalX, lerpTarget, lerpSpeed * Time.deltaTime);
 
-            if (Mathf.Approximately(pos.x, lerpTarget))
+            if (Mathf.Approximately(targetLocalX, lerpTarget))
                 lerpOverrideActive = false;
         }
         else
         {
             float t = Mathf.InverseLerp(slideMin, slideMax, rawSlide);
-            pos.x = Mathf.Lerp(-slideRange, slideRange, t);
+            targetLocalX = Mathf.Lerp(-slideRange, slideRange, t);
         }
-
-        transform.localPosition = pos;
 
         // ---------------- BUTTON ----------------
         buttonPressed = SerialManager.Instance.GetValue(buttonIndex) == 1f;
