@@ -3,7 +3,18 @@ using System.Collections;
 
 public class BallBehaviour : MonoBehaviour
 {
-    public void OnGoal()
+    private Rigidbody rb;
+    public float maxSpeed = 10f;
+
+	private void Start()
+	{
+        rb = GetComponent<Rigidbody>();
+
+        // Sets the built-in PhysX max linear velocity clamp
+        rb.maxLinearVelocity = maxSpeed;
+    }
+
+	public void OnGoal()
     {
         StartCoroutine(FadeAndFreeze());
     }

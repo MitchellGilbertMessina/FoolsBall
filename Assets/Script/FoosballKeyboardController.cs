@@ -4,9 +4,6 @@ using Unity.Mathematics;
 
 public class FoosballKeyboardController : MonoBehaviour
 {
-    public Transform player1Rod;
-    public Transform player2Rod;
-
     public GameObject wall1;
     public GameObject wall2;
 
@@ -20,16 +17,26 @@ public class FoosballKeyboardController : MonoBehaviour
     float slideMin;
     float slideMax;
 
-    [Header("ChocDino Mouse Party")]
-    [Tooltip("Multiplier applied to each mouse's raw pixel movement before it is added to that player's virtual cursor.")]
     public float mouseSensitivity = 1f;
+
+    public Transform player1Rod;
+    public Transform player2Rod;
+
+    public int mouse1Index;
+    public int mouse2Index;
 
     // Per-player accumulated "virtual cursor" screen positions (deltas from the mice are added here each frame).
     Vector3 player1Cursor;
     Vector3 player2Cursor;
 
+    float player1TargetX;
+    float player2TargetX;
+
     float player1Rotation;
     float player2Rotation;
+
+    Rigidbody player1RigidBody;
+    Rigidbody player2RigidBody;
 
     Camera cam;
     Plane groundPlane;
@@ -53,6 +60,25 @@ public class FoosballKeyboardController : MonoBehaviour
 
         slideMin = math.min(wall1X, wall2X)+ wallPadding;
         slideMax = math.max(wall1X, wall2X) - wallPadding;
+
+        player1RigidBody = CacheRodBody(player1Rod);
+        player2RigidBody = CacheRodBody(player2Rod);
+
+        // Start the slide targets where the rods currently are so nothing snaps on the first frame.
+        if (player1Rod != null) player1TargetX = player1Rod.position.x;
+        if (player2Rod != null) player2TargetX = player2Rod.position.x;
+    }
+
+    Rigidbody CacheRodBody(Transform rod)
+    {
+        if (rod == null) return null;
+
+        Rigidbody body = rod.GetComponent<Rigidbody>();
+        if (body == null)
+            Debug.LogWarning($"[FoolsBall] '{rod.name}' has no Rigidbody. Add a kinematic Rigidbody to the rod so it can kick the ball.");
+        else if (!body.isKinematic)
+            Debug.LogWarning($"[FoolsBall] '{rod.name}' Rigidbody should be marked Is Kinematic.");
+        return body;
     }
 
     void OnEnable()
@@ -77,16 +103,24 @@ public class FoosballKeyboardController : MonoBehaviour
 
         var mice = MouseDeviceManager.Instance.All;
 
+        // TEMP DIAGNOSTIC: shows how many mice are seen and whether movement deltas arrive.
+        if (mice.Count > 0)
+            Debug.Log($"[FoolsBall] mice={mice.Count} delta={mice[0].PositionDelta} scroll={mice[0].ScrollDelta} p1TargetX={player1TargetX:F4}");
+        else
+            Debug.Log("[FoolsBall] mice=0 (no device registered yet — wiggle the mouse)");
+
         // Drive each player only if its mouse has connected yet. A device only appears in
         // the list AFTER that physical mouse first sends input, so wiggle each mouse once.
-        if (mice.Count > 0)
-            HandlePlayer(mice[0], player1Rod, ref player1Cursor, ref player1Rotation);
+        if (mice.Count >= mouse1Index)
+            HandlePlayer(mice[mouse1Index], player1Rod, ref player1Cursor, ref player1TargetX, ref player1Rotation);
 
-        if (mice.Count > 1)
-            HandlePlayer(mice[1], player2Rod, ref player2Cursor, ref player2Rotation);
-    }
+		if (mice.Count >= mouse2Index)
+			HandlePlayer(mice[mouse2Index], player2Rod, ref player2Cursor, ref player2TargetX, ref player2Rotation);
+	}
 
-    void HandlePlayer(MouseDevice mouse, Transform rod, ref Vector3 cursor, ref float rotation)
+    // Read input every frame (so no movement is missed) but only record TARGETS here;
+    // the actual motion is applied through physics in FixedUpdate.
+    void HandlePlayer(MouseDevice mouse, Transform rod, ref Vector3 cursor, ref float targetX, ref float rotation)
     {
         if (mouse == null || rod == null) return;
 
@@ -96,19 +130,37 @@ public class FoosballKeyboardController : MonoBehaviour
         cursor.x = Mathf.Clamp(cursor.x, 0f, Screen.width);
         cursor.y = Mathf.Clamp(cursor.y, 0f, Screen.height);
 
-        // --- Slide: raycast the virtual cursor onto the ground plane, drive rod X ---
+        // --- Slide target: raycast the virtual cursor onto the ground plane ---
         Ray ray = cam.ScreenPointToRay(cursor);
         if (groundPlane.Raycast(ray, out float enter))
         {
             Vector3 hit = ray.GetPoint(enter);
-            float x = Mathf.Clamp(hit.x, slideMin, slideMax);
-            rod.position = new Vector3(x, rod.position.y, rod.position.z);
+            targetX = Mathf.Clamp(hit.x, slideMin, slideMax);
         }
 
-        // --- Rotation: this mouse's scroll wheel ---
-        float scroll = mouse.ScrollDelta.y;
-        rotation += scroll * rotationSpeed * Time.deltaTime;
+        // --- Rotation target: accumulate this mouse's scroll wheel ---
+        rotation += mouse.ScrollDelta.y * rotationSpeed * Time.deltaTime;
+    }
 
-        rod.localRotation = Quaternion.Euler(-rotation, 0, 90);
+    // Move the kinematic Rigidbodies here so the feet impart real velocity to the ball.
+    void FixedUpdate()
+    {
+        ApplyRod(player1RigidBody, player1Rod, player1TargetX, player1Rotation);
+        ApplyRod(player2RigidBody, player2Rod, player2TargetX, player2Rotation);
+    }
+
+    void ApplyRod(Rigidbody body, Transform rod, float targetX, float rotation)
+    {
+        if (body == null || rod == null) return;
+
+        // Slide along X, keep the rod's current Y/Z.
+        Vector3 pos = body.position;
+        pos.x = targetX;
+        body.MovePosition(pos);
+
+        // Rotation is authored in local space; convert to world for MoveRotation.
+        Quaternion localTarget = Quaternion.Euler(-rotation, 0f, 90f);
+        Quaternion worldTarget = rod.parent != null ? rod.parent.rotation * localTarget : localTarget;
+        body.MoveRotation(worldTarget);
     }
 }
