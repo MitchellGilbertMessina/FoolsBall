@@ -8,7 +8,7 @@ public class SerialManager : MonoBehaviour
     public static SerialManager Instance { get; private set; }
 
     [Header("Connection Settings")]
-    public int baudRate = 230400;
+    public int baudRate = 115200;
     public int minExpectedValues = 5;
     public int maxExpectedValues = 10;
 
@@ -175,6 +175,7 @@ public class SerialManager : MonoBehaviour
     void ParseLine(string line)
     {
         if (string.IsNullOrEmpty(line)) return;
+        Debug.Log("RX: " + line);
 
         line = line.Trim();
 
