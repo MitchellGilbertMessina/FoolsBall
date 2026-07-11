@@ -3343,7 +3343,7 @@ MonoBehaviour:
   buttonIndex: 5
   limitAIndex: 8
   limitBIndex: 9
-  invertLimitMapping: 0
+  invertLimitMapping: 1
   slideMin: -671
   slideMax: -17
   slideRange: 0.12
