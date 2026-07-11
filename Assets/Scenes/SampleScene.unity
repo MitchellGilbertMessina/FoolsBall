@@ -671,7 +671,7 @@ GameObject:
   - component: {fileID: 92493594}
   - component: {fileID: 92493598}
   m_Layer: 0
-  m_Name: Player01
+  m_Name: PlayerRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -788,8 +788,8 @@ MonoBehaviour:
   rotationIndex: 0
   slideIndex: 1
   buttonIndex: 4
-  slideMin: 827
-  slideMax: 1739
+  slideMin: 94.6
+  slideMax: 990
   slideRange: 0.12
   rotationDirection: -1
 --- !u!1 &97579163
@@ -3953,7 +3953,7 @@ GameObject:
   - component: {fileID: 1454322430}
   - component: {fileID: 1454322434}
   m_Layer: 0
-  m_Name: Player02 (1)
+  m_Name: PlayerBlue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4070,8 +4070,8 @@ MonoBehaviour:
   rotationIndex: 2
   slideIndex: 3
   buttonIndex: 5
-  slideMin: 356
-  slideMax: -315
+  slideMin: -671
+  slideMax: -17
   slideRange: 0.12
   rotationDirection: 1
 --- !u!1 &1481647960
