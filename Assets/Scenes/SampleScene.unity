@@ -1079,7 +1079,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SerialManager
   baudRate: 115200
   minExpectedValues: 5
-  maxExpectedValues: 12
+  maxExpectedValues: 10
 --- !u!114 &230589837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2103,7 +2103,6 @@ GameObject:
   - component: {fileID: 782029009}
   - component: {fileID: 782029008}
   - component: {fileID: 782029012}
-  - component: {fileID: 782029013}
   m_Layer: 0
   m_Name: GoalRed
   m_TagString: Untagged
@@ -2218,18 +2217,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalTrigger
   scoringPlayer: 2
---- !u!114 &782029013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 782029007}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92a4aa1b7f1d345b8a0ca43b5581a888, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Goal
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -3215,8 +3202,8 @@ MonoBehaviour:
   rotationIndex: 2
   slideIndex: 3
   buttonIndex: 5
-  limitAIndex: 8
-  limitBIndex: 9
+  limitAIndex: 6
+  limitBIndex: 7
   invertLimitMapping: 0
   slideMin: -671
   slideMax: -17
@@ -4188,11 +4175,47 @@ PrefabInstance:
       propertyPath: m_Name
       value: RedBody
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 9074082729787078504, guid: aff75baf49ddd42da891f0cfd163c923, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8540141898022005271, guid: aff75baf49ddd42da891f0cfd163c923, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4922194894521926134}
   m_SourcePrefab: {fileID: 100100000, guid: aff75baf49ddd42da891f0cfd163c923, type: 3}
+--- !u!1 &4922194894521926133 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8540141898022005271, guid: aff75baf49ddd42da891f0cfd163c923, type: 3}
+  m_PrefabInstance: {fileID: 4922194894521926132}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &4922194894521926134
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4922194894521926133}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
 --- !u!1001 &8411206488409318874
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4257,11 +4280,47 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8745800055417100093, guid: 30fef584df45d40f083c22a24d2c1cbe, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 798514262592605696, guid: 30fef584df45d40f083c22a24d2c1cbe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8411206488409318876}
   m_SourcePrefab: {fileID: 100100000, guid: 30fef584df45d40f083c22a24d2c1cbe, type: 3}
+--- !u!1 &8411206488409318875 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 798514262592605696, guid: 30fef584df45d40f083c22a24d2c1cbe, type: 3}
+  m_PrefabInstance: {fileID: 8411206488409318874}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &8411206488409318876
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8411206488409318875}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
