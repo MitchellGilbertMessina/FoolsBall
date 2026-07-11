@@ -18,14 +18,32 @@ public class FoosballController : MonoBehaviour
 
     private bool buttonPressed = false;
 
+    // Physics-driven state: input writes these targets in Update, FixedUpdate applies them.
+    private float targetLocalX;
+
+    private Rigidbody body;
+    private Transform rodParent;
+    private Vector3 baseLocalPos;   // resting local position; only X changes when sliding
+
+    void Start()
+    {
+        rodParent = transform.parent;
+        baseLocalPos = transform.localPosition;
+        targetLocalX = baseLocalPos.x;
+
+        body = GetComponent<Rigidbody>();
+        if (body == null)
+            Debug.LogWarning($"[FoolsBall] '{name}' has no Rigidbody. Add a kinematic Rigidbody to the rod so it can kick the ball.");
+        else if (!body.isKinematic)
+            Debug.LogWarning($"[FoolsBall] '{name}' Rigidbody should be marked Is Kinematic.");
+    }
+
+    // Read the serial input every frame, but only record TARGETS here.
     void Update()
     {
         if (SerialManager.Instance == null) return;
 
-        // --- Debug ---
-        Debug.Log($"{gameObject.name} | rot:{SerialManager.Instance.GetValue(rotationIndex)} slide:{SerialManager.Instance.GetValue(slideIndex)}");
-
-        // ---------------- ROTATION (unchanged) ----------------
+        // ---------------- ROTATION ----------------
         float rawRotation = SerialManager.Instance.GetValue(rotationIndex);
 
         if (!rotationOffsetSet)
@@ -39,23 +57,29 @@ public class FoosballController : MonoBehaviour
         if (rotationAngle < -180) rotationAngle += 360;
         if (rotationAngle > 180) rotationAngle -= 360;
 
-        // ---------------- SLIDE (FIXED) ----------------
+        // ---------------- SLIDE ----------------
         float rawSlide = SerialManager.Instance.GetValue(slideIndex);
-
         float t = Mathf.InverseLerp(slideMin, slideMax, rawSlide);
-
-        Vector3 pos = transform.localPosition;
-        pos.x = Mathf.Lerp(-slideRange, slideRange, t);
-        transform.localPosition = pos;
+        targetLocalX = Mathf.Lerp(-slideRange, slideRange, t);
 
         // ---------------- BUTTON ----------------
         buttonPressed = SerialManager.Instance.GetValue(buttonIndex) == 1f;
-
-        UpdateRod();
     }
 
-    void UpdateRod()
+    // Apply motion through physics so the kinematic Rigidbody imparts velocity to the ball.
+    void FixedUpdate()
     {
-        transform.localRotation = Quaternion.Euler(-rotationAngle, 0, 90);
+        if (body == null) return;
+
+        // Slide along local X, keep the rod's resting local Y/Z; convert to world for MovePosition.
+        Vector3 localPos = baseLocalPos;
+        localPos.x = targetLocalX;
+        Vector3 worldPos = rodParent != null ? rodParent.TransformPoint(localPos) : localPos;
+        body.MovePosition(worldPos);
+
+        // Rotation is authored in local space; convert to world for MoveRotation.
+        Quaternion localRot = Quaternion.Euler(-rotationAngle, 0f, 90f);
+        Quaternion worldRot = rodParent != null ? rodParent.rotation * localRot : localRot;
+        body.MoveRotation(worldRot);
     }
 }
