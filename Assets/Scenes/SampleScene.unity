@@ -245,7 +245,7 @@ GameObject:
   - component: {fileID: 25480227}
   - component: {fileID: 25480226}
   m_Layer: 0
-  m_Name: Sphere (4)
+  m_Name: RedSphereTop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -357,7 +357,7 @@ GameObject:
   - component: {fileID: 48256317}
   - component: {fileID: 48256316}
   m_Layer: 0
-  m_Name: Wall
+  m_Name: RedWallTop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -375,8 +375,7 @@ Transform:
   m_LocalPosition: {x: 1.8695652, y: 0, z: -15.46}
   m_LocalScale: {x: 1, y: 1, z: 2.5}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1562295078}
+  m_Children: []
   m_Father: {fileID: 236169919}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &48256316
@@ -919,7 +918,7 @@ GameObject:
   - component: {fileID: 116621743}
   - component: {fileID: 116621744}
   m_Layer: 0
-  m_Name: Goal01
+  m_Name: GoalBlue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1012,7 +1011,7 @@ Transform:
   m_GameObject: {fileID: 116621738}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.3241}
+  m_LocalPosition: {x: 0.002, y: 0, z: 0.3241}
   m_LocalScale: {x: 0.1, y: 0.01, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1087,7 +1086,7 @@ GameObject:
   - component: {fileID: 149704273}
   - component: {fileID: 149704272}
   m_Layer: 0
-  m_Name: Wall (2)
+  m_Name: BlueWallTop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1105,8 +1104,7 @@ Transform:
   m_LocalPosition: {x: 1.8695652, y: 0, z: 0.72}
   m_LocalScale: {x: 1, y: 1, z: 2.5}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1513701602}
+  m_Children: []
   m_Father: {fileID: 236169919}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &149704272
@@ -1402,11 +1400,11 @@ Transform:
   m_LocalScale: {x: 0.115, y: -0.2, z: 0.04}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 48256315}
   - {fileID: 4630596}
   - {fileID: 1325532281}
   - {fileID: 385074166}
   - {fileID: 1814632234}
+  - {fileID: 48256315}
   - {fileID: 149704271}
   - {fileID: 1231832361}
   - {fileID: 1410384635}
@@ -2227,7 +2225,7 @@ GameObject:
   - component: {fileID: 409004570}
   - component: {fileID: 409004569}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: BlueSphereBottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2568,7 +2566,7 @@ GameObject:
   - component: {fileID: 782029012}
   - component: {fileID: 782029013}
   m_Layer: 0
-  m_Name: Goal02
+  m_Name: GoalRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3309,7 +3307,7 @@ GameObject:
   - component: {fileID: 1095057061}
   - component: {fileID: 1095057060}
   m_Layer: 0
-  m_Name: Sphere (3)
+  m_Name: RedSphereBottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3452,7 +3450,7 @@ GameObject:
   - component: {fileID: 1231832363}
   - component: {fileID: 1231832362}
   m_Layer: 0
-  m_Name: Wall (1)
+  m_Name: RedWallBottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3470,8 +3468,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: -15.459999}
   m_LocalScale: {x: 1, y: 1, z: 2.5}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2047261772}
+  m_Children: []
   m_Father: {fileID: 236169919}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1231832362
@@ -3714,7 +3711,7 @@ GameObject:
   - component: {fileID: 1410384637}
   - component: {fileID: 1410384636}
   m_Layer: 0
-  m_Name: Wall (3)
+  m_Name: BlueWallBottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4231,37 +4228,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!1 &1513701601
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1513701602}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1513701602
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1513701601}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 149704271}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1514730911
 GameObject:
   m_ObjectHideFlags: 0
@@ -4409,7 +4375,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1522269034}
   m_Layer: 0
-  m_Name: Player02Body
+  m_Name: BlueBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4672,37 +4638,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!1 &1562295077
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1562295078}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1562295078
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1562295077}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 48256315}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1658532206
 GameObject:
   m_ObjectHideFlags: 0
@@ -5304,7 +5239,7 @@ GameObject:
   - component: {fileID: 1961099213}
   - component: {fileID: 1961099212}
   m_Layer: 0
-  m_Name: Sphere (2)
+  m_Name: BlueSphereTop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5662,7 +5597,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2022060224}
   m_Layer: 0
-  m_Name: Player01Body
+  m_Name: RedBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5823,37 +5758,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2034800754}
   m_CullTransparentMesh: 1
---- !u!1 &2047261771
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2047261772}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2047261772
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047261771}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1231832361}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2075724596
 GameObject:
   m_ObjectHideFlags: 0
