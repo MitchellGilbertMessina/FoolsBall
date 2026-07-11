@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1e59b3f005b24c44ba1262b105c964d9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 324696
+  packageName: Mouse Party Lite
+  packageVersion: 1.3.0
+  assetPath: Assets/ChocDino/PartyIO/Demos/Cursors/MouseCursorArrow.asset
+  uploadId: 935124

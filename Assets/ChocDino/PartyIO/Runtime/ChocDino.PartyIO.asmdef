@@ -1,0 +1,27 @@
+{
+    "name": "ChocDino.PartyIO",
+    "references": [
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:09dcc9c0126b6b34ab2a877b8f2277f5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "PACKAGE_UITOOLKIT"
+        },
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0.0",
+            "define": "PACKAGE_INPUTSYSTEM"
+        }
+    ],
+    "noEngineReferences": false
+}

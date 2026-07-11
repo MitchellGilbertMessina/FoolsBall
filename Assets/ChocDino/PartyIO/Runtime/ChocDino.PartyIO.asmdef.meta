@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d44a173cf73893a4aadd29bc85ccd033
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 324696
+  packageName: Mouse Party Lite
+  packageVersion: 1.3.0
+  assetPath: Assets/ChocDino/PartyIO/Runtime/ChocDino.PartyIO.asmdef
+  uploadId: 935124

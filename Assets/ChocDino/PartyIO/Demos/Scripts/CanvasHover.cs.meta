@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ee79f8bc2acfa2b43ae59b281622270a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 324696
+  packageName: Mouse Party Lite
+  packageVersion: 1.3.0
+  assetPath: Assets/ChocDino/PartyIO/Demos/Scripts/CanvasHover.cs
+  uploadId: 935124

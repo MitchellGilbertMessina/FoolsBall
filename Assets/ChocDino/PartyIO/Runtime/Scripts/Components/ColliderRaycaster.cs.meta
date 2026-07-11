@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: cab17bd7b7954a04a910ec7d58ff1f6e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: 0a784522b4754404bae870ceffb86ecc, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 324696
+  packageName: Mouse Party Lite
+  packageVersion: 1.3.0
+  assetPath: Assets/ChocDino/PartyIO/Runtime/Scripts/Components/ColliderRaycaster.cs
+  uploadId: 935124
