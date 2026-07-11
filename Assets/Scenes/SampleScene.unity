@@ -739,7 +739,7 @@ MonoBehaviour:
   invertLimitMapping: 0
   slideMin: 94.6
   slideMax: 990
-  slideRange: 0.16
+  slideRange: 0.2
   rotationDirection: -1
 --- !u!1 &116621738
 GameObject:
@@ -3220,7 +3220,7 @@ MonoBehaviour:
   invertLimitMapping: 0
   slideMin: -671
   slideMax: -17
-  slideRange: 0.16
+  slideRange: 0.2
   rotationDirection: 1
 --- !u!1 &1513337458
 GameObject:
