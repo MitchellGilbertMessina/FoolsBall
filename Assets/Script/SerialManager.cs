@@ -7,15 +7,14 @@ public class SerialManager : MonoBehaviour
 {
     public static SerialManager Instance { get; private set; }
 
-    [Header("Port Settings")]
-    [Tooltip("Leave empty if using Boot Scene selector")]
-    public string portName;
-
+    [Header("Connection Settings")]
     public int baudRate = 230400;
+    public int minExpectedValues = 5;
+    public int maxExpectedValues = 10;
 
     private SerialPort serial;
     private Thread serialThread;
-    private bool keepReading = true;
+    private volatile bool keepReading = true;
 
     private readonly object dataLock = new object();
     private float[] parsedValues = new float[6];
@@ -23,6 +22,7 @@ public class SerialManager : MonoBehaviour
     // ---------------- STATE ----------------
     public bool IsConnected { get; private set; }
     public bool HasNewData { get; private set; }
+    public string ConnectedPort { get; private set; }
 
     void Awake()
     {
@@ -35,15 +35,7 @@ public class SerialManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // ---------------- AUTO PORT LOAD ----------------
-        if (string.IsNullOrEmpty(portName))
-        {
-            portName = PlayerPrefs.GetString("lastPort", "");
-        }
-
-        OpenPort();
-
-        serialThread = new Thread(ReadSerialThread);
+        serialThread = new Thread(SerialLoop);
         serialThread.IsBackground = true;
         serialThread.Start();
     }
@@ -61,93 +53,119 @@ public class SerialManager : MonoBehaviour
         }
     }
 
-    public void SetPort(string newPort)
-    {
-        portName = newPort;
-        PlayerPrefs.SetString("lastPort", portName);
-        PlayerPrefs.Save();
+    // ---------------- SCANNING ----------------
 
-        ClosePort();
-        OpenPort();
+    string ScanForArduino()
+    {
+        string[] ports = SerialPort.GetPortNames();
+
+        foreach (string port in ports)
+        {
+            if (TryHandshake(port))
+                return port;
+        }
+
+        return null;
     }
 
-    // ---------------- CONNECTION ----------------
-
-    public void OpenPort()
+    bool TryHandshake(string port)
     {
+        SerialPort probe = null;
+
         try
         {
-            if (string.IsNullOrEmpty(portName))
-            {
-                Debug.LogWarning("No serial port selected.");
-                return;
-            }
-
-            if (serial != null && serial.IsOpen)
-                serial.Close();
-
-            serial = new SerialPort(portName, baudRate)
+            probe = new SerialPort(port, baudRate)
             {
                 DtrEnable = true,
                 RtsEnable = true,
-                ReadTimeout = 50
+                ReadTimeout = 1000
             };
 
-            serial.Open();
+            probe.Open();
 
-            IsConnected = true;
-            Debug.Log("Serial opened / connected on: " + portName);
-        }
-        catch (System.Exception e)
-        {
-            IsConnected = false;
-            Debug.LogWarning("Serial open failed: " + e.Message);
-        }
-    }
+            // Discard partial/startup lines
+            try { probe.ReadLine(); } catch (System.TimeoutException) { return false; }
 
-    public void ClosePort()
-    {
+            // Validate a real data line
+            string line = probe.ReadLine().Trim();
+            if (IsValidDataLine(line))
+            {
+                // This is our Arduino — adopt the connection
+                probe.ReadTimeout = 50;
+                serial = probe;
+                return true;
+            }
+        }
+        catch (System.Exception) { }
+
+        // Not the right port — clean up
         try
         {
-            if (serial != null)
-            {
-                serial.DtrEnable = false;
-                serial.RtsEnable = false;
+            if (probe != null && probe.IsOpen)
+                probe.Close();
 
-                if (serial.IsOpen)
-                    serial.Close();
-            }
+            probe?.Dispose();
         }
         catch { }
 
-        IsConnected = false;
+        return false;
+    }
+
+    bool IsValidDataLine(string line)
+    {
+        if (string.IsNullOrEmpty(line)) return false;
+
+        string[] parts = line.Split(',');
+        if (parts.Length < minExpectedValues || parts.Length > maxExpectedValues) return false;
+
+        foreach (string part in parts)
+        {
+            if (!float.TryParse(part.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+                return false;
+        }
+
+        return true;
     }
 
     // ---------------- THREAD ----------------
 
-    void ReadSerialThread()
+    void SerialLoop()
     {
         while (keepReading)
         {
-            try
+            if (serial == null || !serial.IsOpen)
             {
-                if (serial != null && serial.IsOpen)
-                {
-                    string line = serial.ReadLine();
-                    ParseLine(line);
+                IsConnected = false;
+                ConnectedPort = null;
 
+                string found = ScanForArduino();
+
+                if (found != null)
+                {
+                    ConnectedPort = found;
                     IsConnected = true;
-                    HasNewData = true;
+                    Debug.Log("Arduino found on: " + found);
                 }
                 else
                 {
-                    IsConnected = false;
+                    // Wait before rescanning to avoid busy-loop
+                    Thread.Sleep(1000);
+                    continue;
                 }
+            }
+
+            // ---------------- READ LOOP ----------------
+            try
+            {
+                string line = serial.ReadLine();
+                ParseLine(line);
+                HasNewData = true;
             }
             catch (System.TimeoutException) { }
             catch (System.Exception)
             {
-                IsConnected = false;
+                // Connection lost — close and let the outer loop rescan
+                ClosePort();
             }
         }
     }
@@ -200,12 +218,34 @@ public class SerialManager : MonoBehaviour
 
     // ---------------- CLEANUP ----------------
 
+    void ClosePort()
+    {
+        try
+        {
+            if (serial != null)
+            {
+                serial.DtrEnable = false;
+                serial.RtsEnable = false;
+
+                if (serial.IsOpen)
+                    serial.Close();
+
+                serial.Dispose();
+            }
+        }
+        catch { }
+
+        serial = null;
+        IsConnected = false;
+        ConnectedPort = null;
+    }
+
     void OnDestroy()
     {
         keepReading = false;
 
         if (serialThread != null && serialThread.IsAlive)
-            serialThread.Join();
+            serialThread.Join(2000);
 
         ClosePort();
     }
