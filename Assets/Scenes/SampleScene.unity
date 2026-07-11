@@ -1079,7 +1079,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SerialManager
   baudRate: 115200
   minExpectedValues: 5
-  maxExpectedValues: 10
+  maxExpectedValues: 12
 --- !u!114 &230589837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1984,7 +1984,7 @@ MonoBehaviour:
   blueBody: {fileID: 1522269034}
   goalLerpSpeed: 6
   figureSpread: 0.25
-  figureLerpSpeed: 3
+  figureLerpSpeed: 0.33
 --- !u!4 &575669734
 Transform:
   m_ObjectHideFlags: 0
@@ -3247,7 +3247,7 @@ Transform:
   m_GameObject: {fileID: 1513337458}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.12, y: 0.02, z: 0}
+  m_LocalPosition: {x: 0.229, y: 0.02, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3970,7 +3970,7 @@ Transform:
   m_GameObject: {fileID: 1928160054}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -0.12, y: 0.04, z: 0}
+  m_LocalPosition: {x: -0.221, y: 0.04, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
