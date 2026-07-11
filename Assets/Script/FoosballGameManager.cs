@@ -37,8 +37,8 @@ public TMP_Text player2Text;
         if (SerialManager.Instance == null) return;
 
         // ---- read buttons ----
-        bool b1 = SerialManager.Instance.GetValue(4) == 1f;
-        bool b2 = SerialManager.Instance.GetValue(5) == 1f;
+        bool b1 = (SerialManager.Instance.GetValue(4) == 1f) || (Input.GetKey(KeyCode.T));
+        bool b2 = SerialManager.Instance.GetValue(5) == 1f || (Input.GetKey(KeyCode.Y));
 
         // ---- EDGE TRIGGER SPAWNING ----
         if (b1 && !prevB1)
