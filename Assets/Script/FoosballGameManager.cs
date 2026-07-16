@@ -15,6 +15,9 @@ public class FoosballGameManager : MonoBehaviour
     public float spawnForce = 5f;
     public float randomness = 0.3f;
 
+    [Header("Shake Settings")]
+    public float shakeForce = 0.02f;
+
     private List<GameObject> activeBalls = new List<GameObject>();
 
     private int player1Score = 0;
@@ -56,6 +59,12 @@ public TMP_Text player2Text;
 
         // ---- cleanup null references ----
         activeBalls.RemoveAll(ball => ball == null);
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            ShakeBalls();
+        }
+
     }
 
     // ---------------- SPAWN ----------------
@@ -119,11 +128,30 @@ public TMP_Text player2Text;
     }
 
     void UpdateScoreUI()
-{
-    if (player1Text != null)
-        player1Text.text = player1Score + " :Red" ;
+    {
+        if (player1Text != null)
+            player1Text.text = player1Score + " :Red" ;
 
-    if (player2Text != null)
-        player2Text.text = "Blue: " + player2Score;
-}
+        if (player2Text != null)
+            player2Text.text = "Blue: " + player2Score;
+    }
+
+    public void ShakeBalls()
+    {
+        foreach (GameObject ball in activeBalls)
+        {
+            if (ball == null)
+                continue;
+
+            Rigidbody rb = ball.GetComponent<Rigidbody>();
+            if (rb == null)
+                continue;
+
+            Vector2 dir = Random.insideUnitCircle.normalized;
+            rb.AddForce(new Vector3(dir.x, 0f, dir.y) * shakeForce, ForceMode.Impulse);
+        }
+
+        Debug.Log($"SHAKE → nudged {activeBalls.Count} ball(s)");
+    }
+
 }

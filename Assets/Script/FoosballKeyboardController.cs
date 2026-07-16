@@ -93,7 +93,7 @@ public class FoosballKeyboardController : MonoBehaviour
 
         // --- Rotation target: accumulate this mouse's scroll wheel ---
         float invertRot = invertRotation ? -1 : 1;
-        rotation += mouse.PositionDelta.x * rotationSpeed * Time.deltaTime * invertRot;
+        rotation += mouse.ScrollDelta.y * rotationSpeed * Time.deltaTime * invertRot;
     }
 
 

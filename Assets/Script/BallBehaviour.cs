@@ -11,7 +11,7 @@ public class BallBehaviour : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         // Sets the built-in PhysX max linear velocity clamp
-        rb.maxLinearVelocity = maxSpeed;
+        //rb.maxLinearVelocity = maxSpeed;
     }
 
 	public void OnGoal()
