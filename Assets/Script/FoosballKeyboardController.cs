@@ -6,11 +6,13 @@ public class FoosballKeyboardController : MonoBehaviour
 {
     public bool updateMouse;
     public bool invertRotation;
+    public bool useScrollWheel;
 
     public float groundPlaneOffset;
 
     public float slideSpeed = 2f;
-    public float rotationSpeed = 500f;
+    public float scrollRotationSpeed = 500f;
+    public float mouseRotationSpeed = 500f;
 
     public float slideMin;
     public float slideMax;
@@ -80,8 +82,8 @@ public class FoosballKeyboardController : MonoBehaviour
         cursor += new Vector3(mouse.PositionDelta.x, -mouse.PositionDelta.y, 0f) * mouseSensitivity;
 
         // Keep the  cursor on screen.
-        cursor.x = Mathf.Clamp(cursor.x, 0f, Screen.width);
-        cursor.y = Mathf.Clamp(cursor.y, 0f, Screen.height);
+        //cursor.x = Mathf.Clamp(cursor.x, 0f, Screen.width);
+        //cursor.y = Mathf.Clamp(cursor.y, 0f, Screen.height);
 
         // --- Slide target: raycast the virtual cursor onto the ground plane ---
         Ray ray = cam.ScreenPointToRay(cursor);
@@ -93,7 +95,12 @@ public class FoosballKeyboardController : MonoBehaviour
 
         // --- Rotation target: accumulate this mouse's scroll wheel ---
         float invertRot = invertRotation ? -1 : 1;
-        rotation += mouse.ScrollDelta.y * rotationSpeed * Time.deltaTime * invertRot;
+
+        float rotDelta = Time.deltaTime * invertRot;
+
+        rotDelta *= useScrollWheel ? mouse.ScrollDelta.y * scrollRotationSpeed : mouse.PositionDelta.x * mouseRotationSpeed;
+
+        rotation += rotDelta;
     }
 
 
@@ -106,7 +113,7 @@ public class FoosballKeyboardController : MonoBehaviour
         rb.MovePosition(pos);
 
         // Rotation is authored in local space; convert to world for MoveRotation.
-        Quaternion localTarget = Quaternion.Euler(-rotation, 0f, 90f);
+        Quaternion localTarget = Quaternion.Euler(-rotation, 0f, 0);
         Quaternion worldTarget = transform.parent != null ? transform.parent.rotation * localTarget : localTarget;
         rb.MoveRotation(worldTarget);
     }

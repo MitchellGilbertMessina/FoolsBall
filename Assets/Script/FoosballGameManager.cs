@@ -6,6 +6,9 @@ public class FoosballGameManager : MonoBehaviour
 {
     public static FoosballGameManager Instance;
 
+    public GameObject playerRed;
+    public GameObject playerBlue;
+
     [Header("Ball Setup")]
     public GameObject ballPrefab;
     public Transform spawnLeft;
@@ -13,10 +16,12 @@ public class FoosballGameManager : MonoBehaviour
 
     [Header("Spawn Settings")]
     public float spawnForce = 5f;
-    public float randomness = 0.3f;
+    public Vector2 spawnAngleRange;
 
     [Header("Shake Settings")]
     public float shakeForce = 0.02f;
+    public Transform leftWall;
+    public Transform rightWall;
 
     private List<GameObject> activeBalls = new List<GameObject>();
 
@@ -60,6 +65,12 @@ public TMP_Text player2Text;
         // ---- cleanup null references ----
         activeBalls.RemoveAll(ball => ball == null);
 
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetBalls();
+        }
+
+
         if (Input.GetKeyDown(KeyCode.U))
         {
             ShakeBalls();
@@ -78,13 +89,9 @@ public TMP_Text player2Text;
 
         if (rb != null)
         {
-            Vector3 randomOffset = new Vector3(
-                Random.Range(-randomness, randomness),
-                0,
-                Random.Range(-randomness, randomness)
-            );
+            float angle = Random.Range(spawnAngleRange.x, spawnAngleRange.y);
 
-            Vector3 finalDir = (direction + randomOffset).normalized;
+            Vector3 finalDir = (Quaternion.AngleAxis(angle, Vector3.up) * direction).normalized;
 
             rb.linearVelocity = finalDir * spawnForce;
         }
@@ -136,8 +143,36 @@ public TMP_Text player2Text;
             player2Text.text = "Blue: " + player2Score;
     }
 
+    public void ResetBalls()
+    {
+        for (int i =0; i< activeBalls.Count; i++)
+        {
+            Destroy(activeBalls[i]);
+        }
+
+        bool left = UnityEngine.Random.value > 0.5f;
+
+        if (left)
+        {
+            SpawnBall(spawnLeft, Vector3.right);
+        }
+        else 
+        {
+            SpawnBall(spawnRight, Vector3.left);
+        }
+    }
+
     public void ShakeBalls()
     {
+        if (leftWall == null || rightWall == null)
+        {
+            Debug.LogWarning("[FoolsBall] SHAKE needs leftWall and rightWall assigned.");
+            return;
+        }
+
+        float minX = Mathf.Min(leftWall.position.x, rightWall.position.x);
+        float maxX = Mathf.Max(leftWall.position.x, rightWall.position.x);
+
         foreach (GameObject ball in activeBalls)
         {
             if (ball == null)
@@ -147,11 +182,50 @@ public TMP_Text player2Text;
             if (rb == null)
                 continue;
 
-            Vector2 dir = Random.insideUnitCircle.normalized;
-            rb.AddForce(new Vector3(dir.x, 0f, dir.y) * shakeForce, ForceMode.Impulse);
+            Transform player = NearestPlayer(ball.transform.position);
+            if (player == null)
+                continue;
+
+            // Rods slide along X at a fixed Z, so a player's reachable line is z = player.z between the walls.
+            Vector3 target = new Vector3(Random.Range(minX, maxX), ball.transform.position.y, player.position.z);
+
+            Vector3 toTarget = target - ball.transform.position;
+            toTarget.y = 0f;
+
+            float distance = toTarget.magnitude;
+            if (distance < 0.001f)
+                continue;
+
+            // Under linear damping a ball coasts v0 / damping before stopping, so this lands it near the line.
+            float damping = rb.linearDamping > 0f ? rb.linearDamping : 1f;
+            rb.linearVelocity = (toTarget / distance) * distance * damping * shakeForce;
         }
 
-        Debug.Log($"SHAKE → nudged {activeBalls.Count} ball(s)");
+        Debug.Log($"SHAKE → kicked {activeBalls.Count} ball(s)");
+    }
+
+    Transform NearestPlayer(Vector3 ballPosition)
+    {
+        Transform nearest = null;
+        float nearestSqr = float.MaxValue;
+
+        foreach (GameObject player in new[] { playerRed, playerBlue })
+        {
+            if (player == null)
+                continue;
+
+            Vector3 offset = player.transform.position - ballPosition;
+            offset.y = 0f;
+
+            float sqr = offset.sqrMagnitude;
+            if (sqr < nearestSqr)
+            {
+                nearestSqr = sqr;
+                nearest = player.transform;
+            }
+        }
+
+        return nearest;
     }
 
 }
