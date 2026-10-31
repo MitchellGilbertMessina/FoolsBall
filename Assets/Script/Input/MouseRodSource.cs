@@ -3,39 +3,50 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Drive one rod at a time with the mouse; Up/Down arrows pick which rod.
-/// Rods you aren't holding stay where you left them.
+/// Drive one rod at a time with the mouse, laid out for the top-down camera.
 ///
-///   Mouse X        slide
-///   Mouse Y        spin (flick up to kick)
-///   Scroll         spin
-///   Click / Space  rod button (spawns a ball for that rod's team)
-///   Tab            release / grab the cursor
+///   Mouse up/down     slide the rod (rods run up/down the screen)
+///   Mouse left/right  spin: the figures' feet follow the mouse, so a quick
+///                     sideways flick toward the opponent's goal is a kick
+///   Left click        grab your back row (goalie)
+///   Right click       grab your front row (strikers)
+///   Up / Down         toggle back/front row
+///   Left / Right      switch to the team on that side of the screen
+///   Space             spawn a ball for the team you're holding
+///   Tab               release / grab the cursor
+///
+/// Rods you aren't holding stay where you left them.
 /// </summary>
 [DefaultExecutionOrder(-200)]
 public class MouseRodSource : RodInputSource
 {
     [Header("Feel")]
-    [Tooltip("Slide change per pixel of horizontal mouse movement. Full travel is 2 (-1..1).")]
+    [Tooltip("Slide change per pixel of vertical mouse movement. Full travel is 2 (-1..1).")]
     public float slideSensitivity = 0.004f;
 
-    [Tooltip("Degrees of spin per pixel of vertical mouse movement.")]
+    [Tooltip("Degrees of spin per pixel of horizontal mouse movement.")]
     public float rotationSensitivity = 0.8f;
 
-    [Tooltip("Degrees of spin per unit of scroll.")]
-    public float scrollSensitivity = 10f;
+    [Tooltip("Degrees of spin per unit of scroll. 0 = off (mouse wheels feel notched; trackpads can be nice).")]
+    public float scrollSensitivity = 0f;
 
     public bool invertSlide = false;
+    [Tooltip("Flip if the feet move the opposite way to the mouse.")]
     public bool invertRotation = false;
+
+    [Header("Screen layout")]
+    [Tooltip("Which team plays on the left of the screen (Left arrow selects it).")]
+    public FoosTeam leftTeam = FoosTeam.Blue;
 
     [Header("Cursor")]
     [Tooltip("Lock and hide the cursor while driving a rod, so movement never hits the screen edge.")]
     public bool captureCursor = true;
 
     readonly Dictionary<int, RodState> states = new Dictionary<int, RodState>();
-    int selectedIndex;
+    FoosTeam selectedTeam = FoosTeam.Blue;
+    FoosRow selectedRow = FoosRow.Back;
     bool isActive;
-    bool waitForClickRelease;
+    bool selectionInitialised;
 
     public override string DisplayName => "Mouse / keyboard";
     public override bool IsAvailable => Mouse.current != null;
@@ -46,9 +57,8 @@ public class MouseRodSource : RodInputSource
     {
         get
         {
-            var rods = RodInputHub.Rods;
-            if (rods.Count == 0) return -1;
-            return rods[Mod(selectedIndex, rods.Count)].rodId;
+            var rod = FindSelectedRod();
+            return rod != null ? rod.rodId : -1;
         }
     }
 
@@ -74,26 +84,43 @@ public class MouseRodSource : RodInputSource
         var rods = RodInputHub.Rods;
         if (rods.Count == 0) return;
 
+        if (!selectionInitialised)
+        {
+            selectedTeam = rods[0].team;
+            selectedRow = rods[0].row;
+            selectionInitialised = true;
+        }
+
         var kb = Keyboard.current;
         var mouse = Mouse.current;
 
-        // ---- rod selection ----
-        int previousId = SelectedRodId;
+        FoosballController previous = FindSelectedRod();
+
+        // ---- selection ----
         if (kb != null)
         {
-            if (kb.upArrowKey.wasPressedThisFrame) selectedIndex++;
-            if (kb.downArrowKey.wasPressedThisFrame) selectedIndex--;
+            if (kb.upArrowKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame)
+                selectedRow = selectedRow == FoosRow.Back ? FoosRow.Front : FoosRow.Back;
+            if (kb.leftArrowKey.wasPressedThisFrame) selectedTeam = leftTeam;
+            if (kb.rightArrowKey.wasPressedThisFrame) selectedTeam = Other(leftTeam);
         }
-        selectedIndex = Mod(selectedIndex, rods.Count);
-        int id = rods[selectedIndex].rodId;
+        if (mouse != null)
+        {
+            if (mouse.leftButton.wasPressedThisFrame) selectedRow = FoosRow.Back;
+            if (mouse.rightButton.wasPressedThisFrame) selectedRow = FoosRow.Front;
+        }
 
-        // Release the button on a rod we just switched away from.
-        if (previousId != id && previousId >= 0 && states.TryGetValue(previousId, out RodState prev))
+        FoosballController rod = FindSelectedRod();
+        if (rod == null) return;
+
+        // Let go of the button on a rod we just switched away from.
+        if (previous != null && previous != rod && states.TryGetValue(previous.rodId, out RodState prev))
         {
             prev.button = false;
-            states[previousId] = prev;
+            states[previous.rodId] = prev;
         }
 
+        int id = rod.rodId;
         if (!states.TryGetValue(id, out RodState s)) s = RodState.Neutral;
         s.button = false;
 
@@ -114,12 +141,8 @@ public class MouseRodSource : RodInputSource
 
             if (Cursor.lockState != CursorLockMode.Locked)
             {
-                // First click only grabs the rod; it shouldn't also spawn a ball.
-                if (mouse.leftButton.wasPressedThisFrame)
-                {
+                if (mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame)
                     CaptureCursor();
-                    waitForClickRelease = true;
-                }
                 states[id] = s;
                 return;
             }
@@ -129,20 +152,38 @@ public class MouseRodSource : RodInputSource
         Vector2 delta = mouse.delta.ReadValue();
         float scroll = mouse.scroll.ReadValue().y;
 
-        s.slide += delta.x * slideSensitivity * (invertSlide ? -1f : 1f);
+        // Screen-up moves the rod toward +slide.
+        s.slide += delta.y * slideSensitivity * (invertSlide ? -1f : 1f);
         s.slide = Mathf.Clamp(s.slide, -1f, 1f);
 
-        float spin = delta.y * rotationSensitivity + scroll * scrollSensitivity;
+        // Feet follow the mouse horizontally on screen, for either team:
+        // the rod's own rotationDirection is undone here so both sides feel the same.
+        float spin = (-delta.x * rotationSensitivity + scroll * scrollSensitivity) * rod.rotationDirection;
         s.angle = Mathf.DeltaAngle(0f, s.angle + spin * (invertRotation ? -1f : 1f));
 
         // ---- button ----
-        if (waitForClickRelease && !mouse.leftButton.isPressed) waitForClickRelease = false;
-        bool click = mouse.leftButton.isPressed && !waitForClickRelease;
-        bool space = kb != null && kb.spaceKey.isPressed;
-        s.button = click || space;
+        s.button = kb != null && kb.spaceKey.isPressed;
 
         states[id] = s;
     }
+
+    FoosballController FindSelectedRod()
+    {
+        var rods = RodInputHub.Rods;
+        FoosballController teamFallback = null;
+
+        foreach (var r in rods)
+        {
+            if (r.team != selectedTeam) continue;
+            if (r.row == selectedRow) return r;
+            if (teamFallback == null) teamFallback = r;
+        }
+
+        if (teamFallback != null) return teamFallback;
+        return rods.Count > 0 ? rods[0] : null;
+    }
+
+    static FoosTeam Other(FoosTeam t) => t == FoosTeam.Red ? FoosTeam.Blue : FoosTeam.Red;
 
     void CaptureCursor()
     {
@@ -156,6 +197,4 @@ public class MouseRodSource : RodInputSource
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
-
-    static int Mod(int a, int n) => ((a % n) + n) % n;
 }
