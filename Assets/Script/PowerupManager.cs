@@ -6,6 +6,12 @@ public class PowerupManager : MonoBehaviour
 {
     [Header("Input")]
     public KeyCode activateKey = KeyCode.Return;
+    [Tooltip("Undo every active power-up and put the table back how it started")]
+    public KeyCode clearKey = KeyCode.Backspace;
+
+    [Header("Duration")]
+    [Tooltip("Seconds before active power-ups wear off by themselves. 0 = they last until cleared.")]
+    public float powerupDuration = 0f;
 
     [Header("Goal References")]
     public Transform blueGoal;
@@ -41,6 +47,14 @@ public class PowerupManager : MonoBehaviour
     // Wall parent for local conversion
     Transform wallParent;
 
+    // Starting layout, so power-ups can be undone
+    Vector3 blueGoalStart, redGoalStart;
+    Vector3 blueWallTopStart, blueWallBottomStart, redWallTopStart, redWallBottomStart;
+    Vector3 redBodyStart, blueBodyStart;
+    float redSlideRangeStart, blueSlideRangeStart;
+    readonly List<GameObject> clones = new List<GameObject>();
+    float expiresAt = -1f;
+
     void Start()
     {
         // Goals are root objects — world X is straightforward
@@ -55,12 +69,74 @@ public class PowerupManager : MonoBehaviour
 
         redSlotTop = redWallTop.position.x;
         redSlotBottom = redWallBottom.position.x;
+
+        blueGoalStart = blueGoal.position;
+        redGoalStart = redGoal.position;
+        blueWallTopStart = blueWallTop.position;
+        blueWallBottomStart = blueWallBottom.position;
+        redWallTopStart = redWallTop.position;
+        redWallBottomStart = redWallBottom.position;
+        redBodyStart = redBody.localPosition;
+        blueBodyStart = blueBody.localPosition;
+        redSlideRangeStart = redController.slideRange;
+        blueSlideRangeStart = blueController.slideRange;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(activateKey))
+        {
             ActivateRandomPowerup();
+            if (powerupDuration > 0f) expiresAt = Time.time + powerupDuration;
+        }
+
+        if (Input.GetKeyDown(clearKey))
+            ClearPowerups();
+
+        if (expiresAt > 0f && Time.time >= expiresAt)
+            ClearPowerups();
+    }
+
+    // ================================================================
+    //  CLEAR
+    // ================================================================
+
+    public void ClearPowerups()
+    {
+        expiresAt = -1f;
+        StopAllCoroutines(); // stop any half-finished slides
+
+        // Goals and walls glide back to where they started
+        StartCoroutine(LerpTo(blueGoal, blueGoalStart));
+        StartCoroutine(LerpTo(redGoal, redGoalStart));
+        StartCoroutine(LerpTo(blueWallTop, blueWallTopStart));
+        StartCoroutine(LerpTo(blueWallBottom, blueWallBottomStart));
+        StartCoroutine(LerpTo(redWallTop, redWallTopStart));
+        StartCoroutine(LerpTo(redWallBottom, redWallBottomStart));
+        currentGoalState = GoalSlot.Middle;
+
+        // Seeing Double: remove the extra figures, re-centre the originals
+        foreach (var c in clones)
+            if (c != null) Destroy(c);
+        clones.Clear();
+
+        StartCoroutine(LerpLocalY(redBody, redBodyStart.y));
+        StartCoroutine(LerpLocalY(blueBody, blueBodyStart.y));
+        redController.slideRange = redSlideRangeStart;
+        blueController.slideRange = blueSlideRangeStart;
+        seeingDoubleActive = false;
+
+        Debug.Log("Powerups cleared");
+    }
+
+    IEnumerator LerpTo(Transform t, Vector3 target)
+    {
+        while ((t.position - target).sqrMagnitude > 0.000001f)
+        {
+            t.position = Vector3.MoveTowards(t.position, target, goalLerpSpeed * Time.deltaTime);
+            yield return null;
+        }
+        t.position = target;
     }
 
     // ---------------- ACTIVATION ----------------
@@ -212,6 +288,7 @@ public class PowerupManager : MonoBehaviour
     {
         // Clone the body
         Transform clone = Instantiate(body, body.parent);
+        clones.Add(clone.gameObject);
         clone.localPosition = body.localPosition;
         clone.localRotation = body.localRotation;
         clone.localScale = body.localScale;
