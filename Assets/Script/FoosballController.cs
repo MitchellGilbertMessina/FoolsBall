@@ -1,132 +1,39 @@
 using UnityEngine;
 
+/// <summary>
+/// One foosball rod. Reads a RodState from RodInputHub (Arduino rods or
+/// mouse/keyboard; it doesn't know or care which) and moves/rotates itself.
+/// Hardware mapping and calibration now live in SerialRodSource.
+/// </summary>
 public class FoosballController : MonoBehaviour
 {
-    public int rotationIndex = 0;
-    public int slideIndex    = 1;
-    public int buttonIndex   = 4;
+    [Header("Identity")]
+    [Tooltip("Unique per rod. Input sources look rods up by this id.")]
+    public int rodId = 0;
+    public FoosTeam team = FoosTeam.Red;
 
-    [Header("Slide Calibration Indices")]
-    [Tooltip("Serial index for this player's limit A trigger")]
-    public int limitAIndex = 6;
-    [Tooltip("Serial index for this player's limit B trigger")]
-    public int limitBIndex = 7;
-
-    [Tooltip("If true, limit A = slideMax and limit B = slideMin (reversed mapping)")]
-    public bool invertLimitMapping = false;
-
-    [Header("Slide Settings")]
-    public float slideMin   = 77f;
-    public float slideMax   = 185f;
+    [Header("Motion")]
+    [Tooltip("Half-width of the rod's travel along local X. Power-ups may change this at runtime.")]
     public float slideRange = 0.3f;
 
-    private float rotationAngle;
-    private float rotationOffset;
-    private bool  rotationOffsetSet = false;
-
+    [Tooltip("1 or -1. Flips spin for rods that face the other way.")]
     public float rotationDirection = 1f;
 
-    private bool buttonPressed = false;
+    /// <summary>The input this rod used this frame.</summary>
+    public RodState Current { get; private set; }
 
-    // ---------------- CALIBRATION EDGE DETECTION ----------------
-    private bool prevLimitA = false;
-    private bool prevLimitB = false;
-
-    // ---------------- LERP OVERRIDE ----------------
-    private bool lerpOverrideActive = false;
-    private float lerpTarget;
-    private float lerpSpeed = 20f;
+    void OnEnable() => RodInputHub.Register(this);
+    void OnDisable() => RodInputHub.Unregister(this);
 
     void Update()
     {
-        if (SerialManager.Instance == null) return;
+        RodState s = RodInputHub.GetRod(rodId);
+        Current = s;
 
-        // --- Debug ---
-        Debug.Log($"{gameObject.name} | rot:{SerialManager.Instance.GetValue(rotationIndex)} slide:{SerialManager.Instance.GetValue(slideIndex)}");
-
-        // ---------------- ROTATION ----------------
-        float rawRotation = SerialManager.Instance.GetValue(rotationIndex);
-
-        if (!rotationOffsetSet)
-        {
-            rotationOffset = rawRotation;
-            rotationOffsetSet = true;
-        }
-
-        rotationAngle = (rawRotation - rotationOffset) * rotationDirection;
-
-        if (rotationAngle < -180) rotationAngle += 360;
-        if (rotationAngle > 180) rotationAngle -= 360;
-
-        // ---------------- SLIDE CALIBRATION ----------------
-        float rawSlide = SerialManager.Instance.GetValue(slideIndex);
-
-        bool limitA = SerialManager.Instance.GetValue(limitAIndex) == 1f;
-        bool limitB = SerialManager.Instance.GetValue(limitBIndex) == 1f;
-
-        if (limitA && !prevLimitA)
-        {
-            if (invertLimitMapping)
-            {
-                slideMax = rawSlide;
-                lerpTarget = slideRange;
-            }
-            else
-            {
-                slideMin = rawSlide;
-                lerpTarget = -slideRange;
-            }
-
-            lerpOverrideActive = true;
-            Debug.Log($"{gameObject.name} | Calibrated limit A → raw {rawSlide}");
-        }
-
-        if (limitB && !prevLimitB)
-        {
-            if (invertLimitMapping)
-            {
-                slideMin = rawSlide;
-                lerpTarget = -slideRange;
-            }
-            else
-            {
-                slideMax = rawSlide;
-                lerpTarget = slideRange;
-            }
-
-            lerpOverrideActive = true;
-            Debug.Log($"{gameObject.name} | Calibrated limit B → raw {rawSlide}");
-        }
-
-        prevLimitA = limitA;
-        prevLimitB = limitB;
-
-        // ---------------- SLIDE POSITION ----------------
         Vector3 pos = transform.localPosition;
-
-        if (lerpOverrideActive)
-        {
-            pos.x = Mathf.MoveTowards(pos.x, lerpTarget, lerpSpeed * Time.deltaTime);
-
-            if (Mathf.Approximately(pos.x, lerpTarget))
-                lerpOverrideActive = false;
-        }
-        else
-        {
-            float t = Mathf.InverseLerp(slideMin, slideMax, rawSlide);
-            pos.x = Mathf.Lerp(-slideRange, slideRange, t);
-        }
-
+        pos.x = s.slide * slideRange;
         transform.localPosition = pos;
 
-        // ---------------- BUTTON ----------------
-        buttonPressed = SerialManager.Instance.GetValue(buttonIndex) == 1f;
-
-        UpdateRod();
-    }
-
-    void UpdateRod()
-    {
-        transform.localRotation = Quaternion.Euler(-rotationAngle, 0, 90);
+        transform.localRotation = Quaternion.Euler(-s.angle * rotationDirection, 0, 90);
     }
 }

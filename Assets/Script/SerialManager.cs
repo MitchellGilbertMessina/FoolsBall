@@ -12,17 +12,35 @@ public class SerialManager : MonoBehaviour
     public int minExpectedValues = 5;
     public int maxExpectedValues = 10;
 
+    [Header("Debug")]
+    [Tooltip("Log every line received from the Arduino (very noisy)")]
+    public bool logRawLines = false;
+
     private SerialPort serial;
     private Thread serialThread;
     private volatile bool keepReading = true;
 
     private readonly object dataLock = new object();
-    private float[] parsedValues = new float[10];
+    // Room for 8+ rods; values beyond what the Arduino sends just stay 0.
+    private const int ValueCapacity = 64;
+    private float[] parsedValues = new float[ValueCapacity];
+
+    // Commands that must run on Unity's main thread (Destroy etc. can't run on the serial thread)
+    private volatile bool resetRequested = false;
+
+    private long linesReceived;
+    private long connectionCount;
 
     // ---------------- STATE ----------------
     public bool IsConnected { get; private set; }
     public bool HasNewData { get; private set; }
     public string ConnectedPort { get; private set; }
+
+    /// <summary>Data lines parsed since the current connection was made.</summary>
+    public long LinesReceived => Interlocked.Read(ref linesReceived);
+
+    /// <summary>Increments every time a (re)connection is made.</summary>
+    public long ConnectionCount => Interlocked.Read(ref connectionCount);
 
     void Awake()
     {
@@ -142,6 +160,8 @@ public class SerialManager : MonoBehaviour
 
                 if (found != null)
                 {
+                    Interlocked.Exchange(ref linesReceived, 0);
+                    Interlocked.Increment(ref connectionCount);
                     ConnectedPort = found;
                     IsConnected = true;
                     Debug.Log("Arduino found on: " + found);
@@ -175,14 +195,17 @@ public class SerialManager : MonoBehaviour
     void ParseLine(string line)
     {
         if (string.IsNullOrEmpty(line)) return;
-        Debug.Log("RX: " + line);
+        if (logRawLines) Debug.Log("RX: " + line);
 
         line = line.Trim();
 
         // ---------------- COMMANDS ----------------
         if (line == "GAME_RESET")
         {
-            FoosballGameManager.Instance?.ResetGame();
+            // Handled in Update: ResetGame() destroys objects, which Unity only
+            // allows on the main thread. Calling it from here threw, and the
+            // catch in SerialLoop then closed the port.
+            resetRequested = true;
             return;
         }
 
@@ -208,6 +231,8 @@ public class SerialManager : MonoBehaviour
                 }
             }
         }
+
+        Interlocked.Increment(ref linesReceived);
     }
 
     // ---------------- UPDATE ----------------
@@ -215,6 +240,12 @@ public class SerialManager : MonoBehaviour
     void Update()
     {
         HasNewData = false;
+
+        if (resetRequested)
+        {
+            resetRequested = false;
+            FoosballGameManager.Instance?.ResetGame();
+        }
     }
 
     // ---------------- CLEANUP ----------------

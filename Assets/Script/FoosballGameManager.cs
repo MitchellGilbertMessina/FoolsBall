@@ -20,9 +20,6 @@ public class FoosballGameManager : MonoBehaviour
     private int player1Score = 0;
     private int player2Score = 0;
 
-    // --- edge detection (prevents spam) ---
-    private bool prevB1 = false;
-    private bool prevB2 = false;
     [Header("UI")]
 public TMP_Text player1Text;
 public TMP_Text player2Text;
@@ -34,25 +31,12 @@ public TMP_Text player2Text;
 
     void Update()
     {
-        if (SerialManager.Instance == null) return;
-
-        // ---- read buttons ----
-        bool b1 = SerialManager.Instance.GetValue(4) == 1f;
-        bool b2 = SerialManager.Instance.GetValue(5) == 1f;
-
-        // ---- EDGE TRIGGER SPAWNING ----
-        if (b1 && !prevB1)
-        {
+        // Rod buttons (Arduino) or click/space (mouse) — RodInputHub handles which.
+        if (RodInputHub.GetButtonDown(FoosTeam.Red))
             SpawnBall(spawnLeft, Vector3.right);
-        }
 
-        if (b2 && !prevB2)
-        {
+        if (RodInputHub.GetButtonDown(FoosTeam.Blue))
             SpawnBall(spawnRight, Vector3.left);
-        }
-
-        prevB1 = b1;
-        prevB2 = b2;
 
         // ---- cleanup null references ----
         activeBalls.RemoveAll(ball => ball == null);
