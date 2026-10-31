@@ -3,8 +3,23 @@ using System.Collections;
 
 public class BallBehaviour : MonoBehaviour
 {
+    // Every ball currently in play, so table-wide effects (FieldForces) can find them
+    static readonly System.Collections.Generic.List<BallBehaviour> active = new System.Collections.Generic.List<BallBehaviour>();
+    public static System.Collections.Generic.IReadOnlyList<BallBehaviour> Active => active;
+
+    public Rigidbody Body { get; private set; }
+    public bool InPlay { get; private set; } = true;
+
+    void Awake() => Body = GetComponent<Rigidbody>();
+    void OnEnable() => active.Add(this);
+    void OnDisable() => active.Remove(this);
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => active.Clear();
+
     public void OnGoal()
     {
+        InPlay = false;
         StartCoroutine(FadeAndFreeze());
     }
 
