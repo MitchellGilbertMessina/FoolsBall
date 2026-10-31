@@ -178,7 +178,7 @@ public class RodInputHub : MonoBehaviour
         {
             int selected = mouseSource.SelectedRodId;
             sb.Append("\n");
-            foreach (var rod in rods)
+            foreach (var rod in mouseSource.ScreenOrder)
             {
                 bool isSel = rod.rodId == selected;
                 string col = rod.team == FoosTeam.Red ? "#ff6b6b" : "#6bb7ff";
@@ -186,7 +186,7 @@ public class RodInputHub : MonoBehaviour
                 sb.Append($"<color={col}>{rod.name}  ({rod.team} {rod.row}, id {rod.rodId})</color>");
                 if (isSel) sb.Append("</b>");
             }
-            sb.Append("\n\n<color=#aaaaaa>mouse up/down: slide · mouse left/right: spin\nLMB back row · RMB front row · Up/Down: row · Left/Right: team\nSpace: ball · Enter: power-up · Backspace: clear power-ups\nTab: free cursor · F1: input mode · H: hide</color>");
+            sb.Append("\n\n<color=#aaaaaa>mouse up/down: slide · scroll: spin (up = kick)\nclick or Left/Right: change rod\nSpace: ball · Enter: power-up · Backspace: clear power-ups\nTab: free cursor · F1: input mode · H: hide</color>");
             if (!mouseSource.CursorCaptured)
                 sb.Append("\n<color=#ffd166>Click the game view to grab the rod</color>");
         }
